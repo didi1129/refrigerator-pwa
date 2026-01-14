@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Refrigerator, Bell } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Refrigerator, Bell, Share, PlusSquare } from 'lucide-react';
 import { useIngredients } from './hooks/useIngredients';
 import { AddIngredientForm } from './components/AddIngredientForm';
 import { IngredientList } from './components/IngredientList';
@@ -8,13 +8,32 @@ import { subscribeToPush } from './utils/push';
 
 function App() {
   const { ingredients, loading, addIngredient, removeIngredient } = useIngredients();
+  const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false);
 
   useEffect(() => {
+    // PWA 독립 실행 모드인지 확인
+    const checkStandalone = () => {
+      const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
+        || (window.navigator as any).standalone
+        || document.referrer.includes('android-app://');
+
+      // 모바일 기기에서 독립 실행 모드가 아닌 경우 설치 유도 팝업 노출
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile && !isStandaloneMode) {
+        setShowPwaInstallPrompt(true);
+      }
+    };
+
+    checkStandalone();
+
     // 앱 진입 시 자동 알림 구독 시도
     const autoSubscribe = async () => {
-      const result = await subscribeToPush();
-      if (result?.success) {
-        console.log('자동 푸시 알림 구독 성공');
+      // 독립 실행 모드에서만 자동 구독 시도 (특히 iOS 배려)
+      if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+        const result = await subscribeToPush();
+        if (result?.success) {
+          console.log('자동 푸시 알림 구독 성공');
+        }
       }
     };
     autoSubscribe();
@@ -25,10 +44,12 @@ function App() {
     if (result?.success) {
       alert('푸시 알림 구독에 성공했습니다! 이제 식재료 만료 알림을 받아보실 수 있습니다.');
     } else {
-      if (result?.error === 'permission_denied') {
+      if (result?.error === 'push_not_supported') {
+        alert('이 브라우저는 푸시 알림을 지원하지 않거나, 홈 화면에 추가된 후에만 가능합니다. "홈 화면에 추가"를 먼저 해주세요.');
+      } else if (result?.error === 'permission_denied') {
         alert('알림 권한이 거부되었습니다. 브라우저 설정에서 알림 권한을 허용해 주세요.');
       } else {
-        alert('푸시 알림 구독에 실패했습니다. 다시 시도해 주세요.');
+        alert('푸시 알림 구독에 실패했습니다. 홈 화면에서 앱을 실행 중인지 확인해 주세요.');
       }
     }
   };
@@ -38,7 +59,45 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen px-6 py-12 max-w-2xl mx-auto">
+    <div className="min-h-screen px-6 py-12 max-w-2xl mx-auto bg-slate-50/50">
+      {showPwaInstallPrompt && (
+        <div className="fixed bottom-6 left-6 right-6 z-50 bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-slate-200 animate-in fade-in slide-in-from-bottom-10 duration-500">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0">
+              <Refrigerator size={24} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-slate-900 mb-1">앱으로 설치해서 사용해보세요!</h3>
+              <p className="text-sm text-slate-500 leading-relaxed mb-4">
+                바탕화면에 설치하면 푸시 알림을 받을 수 있고, 더 빠르게 접근할 수 있어요.
+              </p>
+
+              <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">설치 방법</p>
+                <div className="flex items-center gap-3 text-sm text-slate-600">
+                  <div className="w-6 h-6 rounded-lg bg-white flex items-center justify-center border border-slate-200">
+                    <Share size={14} className="text-slate-400" />
+                  </div>
+                  <span>1. 브라우저의 <strong>공유</strong> 버튼을 눌러주세요.</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-slate-600">
+                  <div className="w-6 h-6 rounded-lg bg-white flex items-center justify-center border border-slate-200">
+                    <PlusSquare size={14} className="text-slate-400" />
+                  </div>
+                  <span>2. <strong>홈 화면에 추가</strong>를 선택해주세요.</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowPwaInstallPrompt(false)}
+                className="mt-6 w-full py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors"
+              >
+                나중에 할게요
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <NotificationBanner ingredients={ingredients} />
 
       <header className="flex items-center justify-between mb-12">
