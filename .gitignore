@@ -3,9 +3,6 @@
 .env.*
 !.env.example
 
-# Supabase
-supabase-edge-function.js
-
 # PWA
 dist
 dist-ssr

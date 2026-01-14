@@ -17,38 +17,65 @@ Deno.serve(async (req) => {
     VAPID_PRIVATE_KEY
   )
 
-  // 1. 유통기한이 3일 남은 식재료 조회 (UTC 기준 오늘+3일)
-  const threeDaysLater = new Date()
-  threeDaysLater.setDate(threeDaysLater.getDate() + 3)
-  const dateString = threeDaysLater.toISOString().split('T')[0]
+  // 1. 유통기한이 오늘부터 3일 이내인 모든 식재료 조회
+  const today = new Date()
+  const todayString = today.toISOString().split('T')[0]
 
-  const { data: items } = await supabase
+  const targetDate = new Date()
+  targetDate.setDate(today.getDate() + 3)
+  const dateString = targetDate.toISOString().split('T')[0]
+
+  console.log(`Checking items between ${todayString} and ${dateString}`)
+
+  const { data: items, error: fetchError } = await supabase
     .from('ingredients')
-    .select('name')
-    .filter('expiry_date', 'gte', `${dateString}T00:00:00`)
-    .filter('expiry_date', 'lte', `${dateString}T23:59:59`)
+    .select('name, expiry_date')
+    .gte('expiry_date', `${todayString}T00:00:00`)
+    .lte('expiry_date', `${dateString}T23:59:59`)
+    .order('expiry_date', { ascending: true })
 
-  if (!items || items.length === 0) return new Response('No items to notify')
+  if (fetchError) {
+    console.error('Error fetching ingredients:', fetchError)
+    return new Response('Error fetching ingredients', { status: 500 })
+  }
+
+  if (!items || items.length === 0) {
+    return new Response(`No items expiring between ${todayString} and ${dateString}`)
+  }
 
   // 2. 모든 푸시 구독 정보 조회
-  const { data: subs } = await supabase.from('push_subscriptions').select('subscription')
-  if (!subs) return new Response('No subscriptions')
+  const { data: subs, error: subError } = await supabase
+    .from('push_subscriptions')
+    .select('subscription')
 
-  // 3. 알림 전송
-  const notifications = items.map(item => ({
-    title: '유통기한 임박 알림! 🚨',
-    body: `${item.name}의 유통기한이 3일 남았습니다.`,
+  if (subError) {
+    console.error('Error fetching subscriptions:', subError)
+    return new Response('Error fetching subscriptions', { status: 500 })
+  }
+
+  if (!subs || subs.length === 0) {
+    return new Response('No subscriptions found')
+  }
+
+  // 3. 알림 내용 생성 (품목 리스트 요약)
+  const payload = {
+    title: '식재료 유통기한 확인! 🚨',
+    body: items.length === 1
+      ? `${items[0].name}의 유통기한이 임박했습니다.`
+      : `${items[0].name} 외 ${items.length - 1}개의 재료가 곧 만료됩니다.`,
     url: '/'
-  }))
+  }
 
-  const sendPromises = subs.flatMap(sub =>
-    notifications.map(notif =>
-      webpush.sendNotification(sub.subscription, JSON.stringify(notif))
-        .catch(err => console.error('Push error:', err))
-    )
+  // 4. 모든 구독자에게 알림 전송
+  const sendPromises = subs.map(sub =>
+    webpush.sendNotification(sub.subscription, JSON.stringify(payload))
+      .catch(err => {
+        console.error('Push error for sub:', err)
+      })
   )
 
   await Promise.all(sendPromises)
+  console.log(`Successfully sent notifications for ${items.length} items to ${subs.length} devices.`)
 
   return new Response('Notifications sent')
 })
