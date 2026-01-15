@@ -22,15 +22,15 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd }) => {
 
   return (
     <form onSubmit={handleSubmit} className="glass p-6 rounded-3xl shadow-xl space-y-4 mb-8">
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-6">
         <div className="w-8 h-8 rounded-full bg-mint-500 flex items-center justify-center text-white">
           <Plus size={20} />
         </div>
         <h2 className="text-xl font-bold text-slate-800">새 식재료 추가</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
           <label className="text-sm font-medium text-slate-500 flex items-center gap-1">
             <Tag size={14} /> 식재료 이름
           </label>
@@ -44,7 +44,7 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd }) => {
           />
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label className="text-sm font-medium text-slate-500 flex items-center gap-1">
             <Calendar size={14} /> 입고일
           </label>
@@ -57,8 +57,8 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd }) => {
           />
         </div>
 
-        <div className="space-y-1 md:col-span-2">
-          <label className="text-sm font-medium text-slate-500">기한 (입고일로부터 며칠 뒤?)</label>
+        <div className="space-y-2 md:col-span-2">
+          <label className="text-sm font-medium text-slate-500 mb-2 block">마감 기한</label>
           <div className="flex gap-2">
             {[3, 7, 14, 30].map((days) => (
               <button
@@ -66,8 +66,8 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd }) => {
                 type="button"
                 onClick={() => setExpiryDays(days.toString())}
                 className={`flex-1 py-2 rounded-xl border transition-all font-semibold ${expiryDays === days.toString()
-                    ? 'bg-mint-500 border-mint-500 text-white shadow-lg'
-                    : 'bg-white/50 border-slate-200 text-slate-500 hover:bg-white'
+                  ? 'bg-mint-500 border-mint-500 text-white shadow-lg'
+                  : 'bg-white/50 border-slate-200 text-slate-500 hover:bg-white'
                   }`}
               >
                 {days}일
