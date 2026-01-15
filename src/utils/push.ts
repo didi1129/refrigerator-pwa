@@ -1,5 +1,16 @@
 import { supabase } from './supabase';
 
+export async function checkSubscription() {
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    return !!subscription;
+  } catch (error) {
+    console.error('구독 확인 중 오류:', error);
+    return false;
+  }
+}
+
 export async function subscribeToPush() {
   try {
     if (!('serviceWorker' in navigator)) {
@@ -21,6 +32,13 @@ export async function subscribeToPush() {
     console.log('서비스 워커 준비 대기 중...');
     const registration = await navigator.serviceWorker.ready;
     console.log('서비스 워커 준비 완료:', registration);
+
+    // 이미 구독 중인지 확인
+    const existingSubscription = await registration.pushManager.getSubscription();
+    if (existingSubscription) {
+      console.log('이미 푸시 알림에 구독되어 있습니다.');
+      return { success: false, error: 'already_subscribed' };
+    }
 
     // 알림 권한 상태 확인
     console.log('현재 알림 권한 상태:', Notification.permission);

@@ -9,8 +9,16 @@ import { subscribeToPush } from './utils/push';
 function App() {
   const { ingredients, loading, addIngredient, removeIngredient } = useIngredients();
   const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false);
+  const [isNotificationPermissionNeeded, setIsNotificationPermissionNeeded] = useState(false);
 
   useEffect(() => {
+    // 알림 권한 상태 확인
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission === 'default') {
+        setIsNotificationPermissionNeeded(true);
+      }
+    }
+
     // PWA 독립 실행 모드인지 확인
     const checkStandalone = () => {
       const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
@@ -33,6 +41,7 @@ function App() {
         const result = await subscribeToPush();
         if (result?.success) {
           console.log('자동 푸시 알림 구독 성공');
+          setIsNotificationPermissionNeeded(false);
         }
       }
     };
@@ -43,8 +52,12 @@ function App() {
     const result = await subscribeToPush();
     if (result?.success) {
       alert('푸시 알림 구독에 성공했습니다! 이제 식재료 만료 알림을 받아보실 수 있습니다.');
+      setIsNotificationPermissionNeeded(false);
     } else {
-      if (result?.error === 'push_not_supported') {
+      if (result?.error === 'already_subscribed') {
+        alert('이미 알림 구독 중입니다. 식재료 만료 전(3일 전)에 알림을 보내드릴게요! 🔔');
+        setIsNotificationPermissionNeeded(false);
+      } else if (result?.error === 'push_not_supported') {
         alert('이 브라우저는 푸시 알림을 지원하지 않거나, 홈 화면에 추가된 후에만 가능합니다. "홈 화면에 추가"를 먼저 해주세요.');
       } else if (result?.error === 'permission_denied') {
         alert('알림 권한이 거부되었습니다. 브라우저 설정에서 알림 권한을 허용해 주세요.');
@@ -111,13 +124,30 @@ function App() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <button
-            onClick={handlePushSubscribe}
-            className="p-3 rounded-2xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors shadow-sm active:scale-95"
-            title="알림 받기"
-          >
-            <Bell size={20} />
-          </button>
+          <div className="relative">
+            {isNotificationPermissionNeeded && (
+              <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="bg-slate-900 text-white text-[11px] font-bold py-2 px-3 rounded-xl shadow-xl whitespace-nowrap border border-slate-700">
+                  <div className="tooltip-arrow" />
+                  식재료 알림을 켜보세요! 🔔
+                </div>
+              </div>
+            )}
+            <button
+              onClick={handlePushSubscribe}
+              className={`p-3 rounded-2xl transition-all shadow-sm active:scale-95 relative ${isNotificationPermissionNeeded
+                ? 'bg-indigo-600 text-white shadow-indigo-200 shadow-xl scale-110'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              title="알림 받기"
+            >
+              {isNotificationPermissionNeeded && (
+                <span className="absolute inset-0 rounded-2xl bg-indigo-600 animate-pulse-ring" />
+              )}
+              <Bell size={20} className={isNotificationPermissionNeeded ? 'animate-pulse-dot' : ''} />
+            </button>
+          </div>
+
           <div className="text-right">
             <p className="text-2xl font-black text-slate-800">{ingredients.length}</p>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Total Items</p>
