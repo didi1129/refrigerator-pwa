@@ -6,6 +6,7 @@ import { getRemainingDays } from '../utils/date';
 export const useIngredients = () => {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
 
   const fetchIngredients = async () => {
     try {
@@ -40,6 +41,7 @@ export const useIngredients = () => {
 
   const addIngredient = async (ingredient: Omit<Ingredient, 'id'>) => {
     try {
+      setAdding(true);
       const { error } = await supabase
         .from('ingredients')
         .insert([{
@@ -72,6 +74,8 @@ export const useIngredients = () => {
       await fetchIngredients();
     } catch (e) {
       console.error('Failed to add ingredient', e);
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -89,5 +93,5 @@ export const useIngredients = () => {
     }
   };
 
-  return { ingredients, loading, addIngredient, removeIngredient };
+  return { ingredients, loading, adding, addIngredient, removeIngredient };
 };

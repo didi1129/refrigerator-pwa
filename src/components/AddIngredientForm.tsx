@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Plus, Calendar, Tag } from 'lucide-react';
+import { Plus, Calendar, Tag, Loader2 } from 'lucide-react';
 import { addDays, format } from 'date-fns';
 
 interface Props {
   onAdd: (name: string, entryDate: string, expiryDate: string) => void;
+  isAdding?: boolean;
 }
 
-export const AddIngredientForm: React.FC<Props> = ({ onAdd }) => {
+export const AddIngredientForm: React.FC<Props> = ({ onAdd, isAdding }) => {
   const [name, setName] = useState('');
   const [entryDate, setEntryDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [expiryDays, setExpiryDays] = useState('7');
@@ -85,9 +86,17 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd }) => {
 
       <button
         type="submit"
-        className="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold text-lg hover:bg-slate-900 transition-all transform active:scale-95 shadow-xl mt-4"
+        disabled={isAdding}
+        className="w-full bg-slate-800 text-white py-4 rounded-2xl font-bold text-lg hover:bg-slate-900 transition-all transform active:scale-95 shadow-xl mt-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:active:scale-100"
       >
-        냉장고에 넣기
+        {isAdding ? (
+          <>
+            <Loader2 className="animate-spin" size={20} />
+            냉장고에 넣는 중...
+          </>
+        ) : (
+          '냉장고에 넣기'
+        )}
       </button>
     </form>
   );

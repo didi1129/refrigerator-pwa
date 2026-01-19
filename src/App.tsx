@@ -11,7 +11,7 @@ interface NavigatorStandalone extends Navigator {
 }
 
 function App() {
-  const { ingredients, loading, addIngredient, removeIngredient } = useIngredients();
+  const { ingredients, loading, adding, addIngredient, removeIngredient } = useIngredients();
   const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false);
   const [isNotificationPermissionNeeded, setIsNotificationPermissionNeeded] = useState(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -158,7 +158,7 @@ function App() {
       </header>
 
       <main className="space-y-8">
-        <AddIngredientForm onAdd={handleAdd} />
+        <AddIngredientForm onAdd={handleAdd} isAdding={adding} />
 
         <section>
           <div className="flex items-center justify-between mb-4 px-2">
