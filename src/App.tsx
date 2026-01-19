@@ -53,7 +53,7 @@ function App() {
   const handlePushSubscribe = async () => {
     const result = await subscribeToPush();
     if (result?.success) {
-      alert('푸시 알림 구독에 성공했습니다! 이제 식재료 만료 알림을 받아보실 수 있습니다.');
+      alert('푸시 알림 구독에 성공했습니다! 정상 작동 확인을 위해 테스트 알림을 보냈습니다. 곧 도착할 거예요! 🔔');
       setIsNotificationPermissionNeeded(false);
     } else {
       if (result?.error === 'already_subscribed') {

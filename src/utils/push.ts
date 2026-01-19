@@ -1,5 +1,20 @@
 import { supabase } from './supabase';
 
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 export async function checkSubscription() {
   try {
     const registration = await navigator.serviceWorker.ready;
@@ -23,11 +38,14 @@ export async function subscribeToPush() {
       return { success: false, error: 'push_not_supported' };
     }
 
-    const publicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-    if (!publicKey) {
+    const publicKeyString = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+    if (!publicKeyString) {
       console.error('VAPID Public Key가 .env 파일에 설정되어 있지 않습니다.');
       return { success: false, error: 'no_public_key' };
     }
+
+    // VAPID 키를 Uint8Array로 변환 (안드로이드/크롬 호환성 향상)
+    const publicKey = urlBase64ToUint8Array(publicKeyString);
 
     console.log('서비스 워커 준비 대기 중...');
     const registration = await navigator.serviceWorker.ready;
@@ -83,7 +101,20 @@ export async function subscribeToPush() {
       console.error('구독 정보 저장 실패:', error);
       return { success: false, error: 'db_error' };
     } else {
-      console.log('푸시 알림 구독 성공!');
+      console.log('푸시 알림 구독 성공! 웰컴 알림을 요청합니다.');
+
+      // 즉시 환영 알림 발송 요청 (Edge Function 호출)
+      try {
+        await supabase.functions.invoke('send-notifications', {
+          body: {
+            name: '내 냉장고를 부탁해',
+            welcome: true
+          }
+        });
+      } catch (invokeError) {
+        console.warn('웰컴 알림 발송 실패 (구독은 성공):', invokeError);
+      }
+
       return { success: true };
     }
   } catch (error) {

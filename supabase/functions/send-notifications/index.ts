@@ -29,9 +29,10 @@ Deno.serve(async (req) => {
 
     let itemsToNotify = []
     let isImmediate = false
+    let body: any = null
 
     if (req.method === 'POST') {
-      const body = await req.json().catch(() => null)
+      body = await req.json().catch(() => null)
       if (body?.name) {
         itemsToNotify = [body]
         isImmediate = true
@@ -57,8 +58,10 @@ Deno.serve(async (req) => {
     if (subError) throw subError
 
     const payload = JSON.stringify({
-      title: isImmediate ? '새 재료 알림! 🥬' : '식재료 유통기한 확인! 🚨',
-      body: itemsToNotify.length === 1 ? `${itemsToNotify[0].name}의 유통기한이 임박했습니다.` : `${itemsToNotify[0].name} 외 ${itemsToNotify.length - 1}개의 재료가 곧 만료됩니다.`,
+      title: body?.welcome ? '알림 설정 완료! 🎉' : (isImmediate ? '새 재료 알림! 🥬' : '식재료 유통기한 확인! 🚨'),
+      body: body?.welcome
+        ? '이제 식재료 만료 3일 전에 알림을 보내드릴게요.'
+        : (itemsToNotify.length === 1 ? `${itemsToNotify[0].name}의 유통기한이 임박했습니다.` : `${itemsToNotify[0].name} 외 ${itemsToNotify.length - 1}개의 재료가 곧 만료됩니다.`),
       url: '/'
     })
 
