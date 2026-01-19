@@ -13,13 +13,19 @@ export const NotificationBanner: React.FC<Props> = ({ ingredients }) => {
 
   useEffect(() => {
     if (urgentItems.length > 0) {
-      setIsVisible(true);
-      const timer = setTimeout(() => {
+      // Sync setState in useEffect can cause cascading renders warning.
+      // We use a small timeout to make it async.
+      const showTimer = setTimeout(() => setIsVisible(true), 0);
+      const hideTimer = setTimeout(() => {
         setIsVisible(false);
       }, 5000);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
     } else {
-      setIsVisible(false);
+      const hideTimer = setTimeout(() => setIsVisible(false), 0);
+      return () => clearTimeout(hideTimer);
     }
   }, [urgentItems.length]);
 

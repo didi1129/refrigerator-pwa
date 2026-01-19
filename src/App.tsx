@@ -6,23 +6,25 @@ import { IngredientList } from './components/IngredientList';
 import { NotificationBanner } from './components/NotificationBanner';
 import { subscribeToPush } from './utils/push';
 
+interface NavigatorStandalone extends Navigator {
+  standalone?: boolean;
+}
+
 function App() {
   const { ingredients, loading, addIngredient, removeIngredient } = useIngredients();
   const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false);
-  const [isNotificationPermissionNeeded, setIsNotificationPermissionNeeded] = useState(false);
+  const [isNotificationPermissionNeeded, setIsNotificationPermissionNeeded] = useState(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      return Notification.permission === 'default';
+    }
+    return false;
+  });
 
   useEffect(() => {
-    // 알림 권한 상태 확인
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      if (Notification.permission === 'default') {
-        setIsNotificationPermissionNeeded(true);
-      }
-    }
-
     // PWA 독립 실행 모드인지 확인
     const checkStandalone = () => {
       const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
-        || (window.navigator as any).standalone
+        || (window.navigator as NavigatorStandalone).standalone
         || document.referrer.includes('android-app://');
 
       // 모바일 기기에서 독립 실행 모드가 아닌 경우 설치 유도 팝업 노출
@@ -37,7 +39,7 @@ function App() {
     // 앱 진입 시 자동 알림 구독 시도
     const autoSubscribe = async () => {
       // 독립 실행 모드에서만 자동 구독 시도 (특히 iOS 배려)
-      if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+      if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as NavigatorStandalone).standalone) {
         const result = await subscribeToPush();
         if (result?.success) {
           console.log('자동 푸시 알림 구독 성공');
