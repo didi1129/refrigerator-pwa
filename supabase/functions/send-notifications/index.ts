@@ -1,5 +1,6 @@
 // Supabase Edge Function: send-notifications
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+// Deno 환경에서 npm 패키지를 안정적으로 사용하기 위해 npm: 지시자 사용
 import webpush from 'npm:web-push@3.6.7'
 
 const corsHeaders = {
