@@ -5,9 +5,10 @@ import { addDays, format } from 'date-fns';
 interface Props {
   onAdd: (name: string, entryDate: string, expiryDate: string) => void;
   isAdding?: boolean;
+  suggestions?: string[];
 }
 
-export const AddIngredientForm: React.FC<Props> = ({ onAdd, isAdding }) => {
+export const AddIngredientForm: React.FC<Props> = ({ onAdd, isAdding, suggestions = [] }) => {
   const [name, setName] = useState('');
   const [entryDate, setEntryDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [expiryDays, setExpiryDays] = useState('7');
@@ -37,12 +38,18 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd, isAdding }) => {
           </label>
           <input
             type="text"
+            list="ingredient-suggestions"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="예: 사과, 우유, 계란"
             className="w-full px-4 py-3 rounded-2xl bg-white/50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-mint-500 transition-all font-medium"
             required
           />
+          <datalist id="ingredient-suggestions">
+            {suggestions.map((item) => (
+              <option key={item} value={item} />
+            ))}
+          </datalist>
         </div>
 
         <div className="space-y-2">

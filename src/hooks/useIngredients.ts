@@ -5,6 +5,7 @@ import { getRemainingDays } from '../utils/date';
 
 export const useIngredients = () => {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
@@ -35,8 +36,23 @@ export const useIngredients = () => {
     }
   };
 
+  const fetchSuggestions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ingredient_suggestions')
+        .select('name')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      setSuggestions((data || []).map(s => s.name));
+    } catch (e) {
+      console.error('Failed to fetch suggestions', e);
+    }
+  };
+
   useEffect(() => {
     fetchIngredients();
+    fetchSuggestions();
   }, []);
 
   const addIngredient = async (ingredient: Omit<Ingredient, 'id'>) => {
@@ -52,6 +68,16 @@ export const useIngredients = () => {
         }]);
 
       if (error) throw error;
+
+      // 새 식재료인 경우 자동완성 목록에도 추가
+      if (!suggestions.includes(ingredient.name)) {
+        await supabase
+          .from('ingredient_suggestions')
+          .insert([{ name: ingredient.name }])
+          .select()
+          .single();
+        await fetchSuggestions();
+      }
 
       // 3일 이내 만료인 경우 즉시 푸시 알림 호출
       const diffDays = getRemainingDays(ingredient.expiryDate);
@@ -93,5 +119,5 @@ export const useIngredients = () => {
     }
   };
 
-  return { ingredients, loading, adding, addIngredient, removeIngredient };
+  return { ingredients, suggestions, loading, adding, addIngredient, removeIngredient };
 };

@@ -11,7 +11,7 @@ interface NavigatorStandalone extends Navigator {
 }
 
 function App() {
-  const { ingredients, loading, adding, addIngredient, removeIngredient } = useIngredients();
+  const { ingredients, suggestions, loading, adding, addIngredient, removeIngredient } = useIngredients();
   const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false);
   const [isNotificationPermissionNeeded, setIsNotificationPermissionNeeded] = useState(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -158,7 +158,7 @@ function App() {
       </header>
 
       <main className="space-y-8">
-        <AddIngredientForm onAdd={handleAdd} isAdding={adding} />
+        <AddIngredientForm onAdd={handleAdd} isAdding={adding} suggestions={suggestions} />
 
         <section>
           <div className="flex items-center justify-between mb-4 px-2">
@@ -181,7 +181,7 @@ function App() {
 
       <footer className="mt-20 text-center">
         <p className="text-xs font-bold text-slate-300 tracking-widest uppercase">
-          &copy; 2026 Refrigerator PWA • Family Edition
+          &copy; 2026 냉장고 재료를 부탁해
         </p>
       </footer>
     </div>
