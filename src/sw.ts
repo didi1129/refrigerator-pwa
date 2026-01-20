@@ -12,8 +12,10 @@ self.addEventListener('push', (event) => {
     body: data.body ?? '확인 필요한 식재료가 있습니다.',
     icon: '/pwa-192x192.png',
     badge: '/pwa-192x192.png',
+    vibrate: [200, 100, 200],
     data: data.url ?? '/',
-  };
+    silent: false,
+  } as NotificationOptions;
 
   event.waitUntil(
     self.registration.showNotification(title, options)
