@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Calendar, Tag, Loader2, Save } from 'lucide-react';
+import { X, Calendar, Tag, Loader2, Save, LayoutGrid } from 'lucide-react';
 import { addDays, format } from 'date-fns';
-import type { Ingredient } from '../types/ingredient';
+import { CATEGORIES, type Ingredient, type IngredientCategory } from '../types/ingredient';
+import { useIngredients } from '../hooks/useIngredients';
 
 interface Props {
   ingredient: Ingredient;
@@ -16,10 +17,21 @@ export const EditIngredientModal: React.FC<Props> = ({
   onClose,
   suggestions = []
 }) => {
+  const { getCategoryByName } = useIngredients();
   const [name, setName] = useState(ingredient.name);
   const [entryDate, setEntryDate] = useState(ingredient.entryDate.slice(0, 10));
   const [expiryDate, setExpiryDate] = useState(ingredient.expiryDate.slice(0, 10));
+  const [category, setCategory] = useState<IngredientCategory>(ingredient.category || '기타');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isCategoryManuallySet, setIsCategoryManuallySet] = useState(false);
+
+  // 이름이 변경될 때 자동으로 카테고리 유추 (사용자가 직접 변경하지 않은 경우에만)
+  React.useEffect(() => {
+    if (name && !isCategoryManuallySet) {
+      const guessed = getCategoryByName(name);
+      setCategory(guessed);
+    }
+  }, [name, getCategoryByName, isCategoryManuallySet]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +41,8 @@ export const EditIngredientModal: React.FC<Props> = ({
     await onUpdate(ingredient.id, {
       name,
       entryDate,
-      expiryDate
+      expiryDate,
+      category
     });
     setIsUpdating(false);
     onClose();
@@ -73,7 +86,10 @@ export const EditIngredientModal: React.FC<Props> = ({
               type="text"
               list="edit-suggestions"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setIsCategoryManuallySet(false); // 이름을 바꾸면 수동 설정 해제
+              }}
               placeholder="식재료 이름을 입력하세요"
               className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700"
               required
@@ -85,6 +101,39 @@ export const EditIngredientModal: React.FC<Props> = ({
             </datalist>
           </div>
 
+          <div className="space-y-3">
+            <label className="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5 ml-1">
+              <LayoutGrid size={12} /> 카테고리
+            </label>
+            {name.trim() !== '' && suggestions.includes(name.trim()) ? (
+              <div className="px-5 py-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                {/* <span className="text-sm font-bold text-slate-700">카테고리 자동완성</span> */}
+                <span className="px-3 py-1 rounded-lg bg-slate-800 text-white text-xs font-black">
+                  {category}
+                </span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                {CATEGORIES.filter(c => c !== '전체').map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => {
+                      setCategory(cat);
+                      setIsCategoryManuallySet(true);
+                    }}
+                    className={`py-2 px-1 rounded-xl border transition-all font-bold text-[11px] sm:text-xs ${category === cat
+                      ? 'bg-slate-800 border-slate-800 text-white shadow-sm'
+                      : 'bg-white border-slate-100 text-slate-500 hover:border-slate-200'
+                      } active:scale-95`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5 ml-1">
@@ -94,7 +143,7 @@ export const EditIngredientModal: React.FC<Props> = ({
                 type="date"
                 value={entryDate}
                 onChange={(e) => setEntryDate(e.target.value)}
-                className="w-full px-6 py-5 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700 appearance-none min-h-[4rem]"
+                className="w-full px-6 py-3 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700 appearance-none min-h-[3.5rem]"
                 required
               />
             </div>
@@ -106,7 +155,7 @@ export const EditIngredientModal: React.FC<Props> = ({
                 type="date"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
-                className="w-full px-6 py-5 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700 appearance-none min-h-[4rem]"
+                className="w-full px-6 py-3 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700 appearance-none min-h-[3.5rem]"
                 required
               />
             </div>
@@ -164,3 +213,4 @@ export const EditIngredientModal: React.FC<Props> = ({
     </div>
   );
 };
+

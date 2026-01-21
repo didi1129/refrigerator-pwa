@@ -73,8 +73,15 @@ export const IngredientList: React.FC<Props> = ({ ingredients, onRemove, onUpdat
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-bold text-slate-800 truncate">{item.name}</h3>
-                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-slate-400 mt-1">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <h3 className="text-lg font-bold text-slate-800 truncate">{item.name}</h3>
+                  {item.category && item.category !== '기타' && (
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-400 uppercase tracking-tight">
+                      {item.category}
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-slate-400">
                   <span className="whitespace-nowrap" title={formatDate(item.entryDate)}>등록: {formatRelativeDate(item.entryDate)}</span>
                   <span className="whitespace-nowrap" title={formatDate(item.expiryDate)}>마감: {formatRelativeDate(item.expiryDate)}</span>
                 </div>

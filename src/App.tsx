@@ -5,6 +5,7 @@ import { AddIngredientForm } from './components/AddIngredientForm';
 import { IngredientList } from './components/IngredientList';
 import { NotificationBanner } from './components/NotificationBanner';
 import { subscribeToPush } from './utils/push';
+import { CATEGORIES, type IngredientCategory } from './types/ingredient';
 
 interface NavigatorStandalone extends Navigator {
   standalone?: boolean;
@@ -14,6 +15,7 @@ function App() {
   const { ingredients, suggestions, loading, adding, addIngredient, updateIngredient, removeIngredient } = useIngredients();
   const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<IngredientCategory>('전체');
   const [isNotificationPermissionNeeded, setIsNotificationPermissionNeeded] = useState(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       return Notification.permission === 'default';
@@ -71,9 +73,13 @@ function App() {
     }
   };
 
-  const handleAdd = async (name: string, entryDate: string, expiryDate: string) => {
-    await addIngredient({ name, entryDate, expiryDate });
+  const handleAdd = async (name: string, entryDate: string, expiryDate: string, category?: IngredientCategory) => {
+    await addIngredient({ name, entryDate, expiryDate, category });
   };
+
+  const filteredIngredients = selectedCategory === '전체'
+    ? ingredients
+    : ingredients.filter(item => item.category === selectedCategory);
 
   return (
     <div className="min-h-screen px-6 py-12 pb-32 max-w-2xl mx-auto bg-slate-50/50">
@@ -159,13 +165,28 @@ function App() {
         </div>
       </header>
 
-      <main className="space-y-8">
+      <main className="space-y-6">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-4 py-2 rounded-2xl text-sm font-bold whitespace-nowrap transition-all active:scale-95 ${selectedCategory === cat
+                ? 'bg-slate-800 text-white shadow-lg'
+                : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-100'
+                }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         <section>
           <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-800">전체</h2>
+              <h2 className="text-lg font-bold text-slate-800">{selectedCategory}</h2>
               <span className="text-sm font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">
-                {ingredients.length}
+                {filteredIngredients.length}
               </span>
             </div>
             <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">
@@ -180,7 +201,7 @@ function App() {
             </div>
           ) : (
             <IngredientList
-              ingredients={ingredients}
+              ingredients={filteredIngredients}
               onRemove={removeIngredient}
               onUpdate={updateIngredient}
               suggestions={suggestions}
@@ -218,3 +239,4 @@ function App() {
 }
 
 export default App;
+
