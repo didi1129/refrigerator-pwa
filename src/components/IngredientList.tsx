@@ -41,57 +41,52 @@ export const IngredientList: React.FC<Props> = ({ ingredients, onRemove, onUpdat
         return (
           <div
             key={item.id}
-            className={`glass p-5 rounded-3xl flex items-center justify-between group transition-all hover:translate-x-1 relative ${activeMenu === item.id ? 'z-[30]' : 'z-0'}`}
+            className={`glass p-5 rounded-3xl flex items-center justify-between group transition-all hover:translate-x-1 relative border border-white/40 shadow-xl shadow-slate-200/50 ${activeMenu === item.id ? 'z-[30]' : 'z-0'}`}
           >
             <div className="flex items-center gap-4 flex-1 min-w-0">
-              <div
-                className={`size-8 rounded-xl flex items-center justify-center shadow-inner flex-shrink-0 ${status === 'expired'
-                  ? 'bg-rose-100 text-rose-500'
-                  : status === 'urgent'
-                    ? 'bg-amber-100 text-amber-500'
-                    : 'bg-emerald-100 text-emerald-500'
-                  }`}
-              >
-                {status === 'expired' ? (
-                  <AlertCircle size={18} />
-                ) : status === 'urgent' ? (
-                  <Clock size={18} />
-                ) : (
-                  <CheckCircle size={18} />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-bold text-slate-800 truncate">{item.name}</h3>
-                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-slate-400 mt-1">
-                  <span className="whitespace-nowrap" title={formatDate(item.entryDate)}>입고: {formatRelativeDate(item.entryDate)}</span>
-                  <span className="whitespace-nowrap" title={formatDate(item.expiryDate)}>만료: {formatRelativeDate(item.expiryDate)}</span>
+              <div className="flex flex-col items-center flex-shrink-0 w-12">
+                <div
+                  className={`size-10 rounded-xl flex items-center justify-center shadow-inner ${status === 'expired'
+                    ? 'bg-red-50 text-red-600'
+                    : status === 'urgent'
+                      ? 'bg-amber-100 text-amber-500'
+                      : 'bg-emerald-100 text-emerald-500'
+                    }`}
+                >
+                  {status === 'expired' ? (
+                    <AlertCircle size={20} />
+                  ) : status === 'urgent' ? (
+                    <Clock size={20} />
+                  ) : (
+                    <CheckCircle size={20} />
+                  )}
                 </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 ml-2">
-              <div className="text-right">
-                <p
-                  className={`text-sm font-black uppercase tracking-wider ${status === 'expired'
-                    ? 'text-rose-500'
+                <span
+                  className={`text-sm font-black tracking-tighter mt-1 ${status === 'expired'
+                    ? 'text-red-600'
                     : status === 'urgent'
                       ? 'text-amber-500'
                       : 'text-emerald-500'
                     }`}
                 >
-                  {status === 'expired' ? (
-                    '기간 만료'
-                  ) : status === 'urgent' ? (
-                    `${remaining}일 남음`
-                  ) : <span className="text-emerald-500">{remaining}일 남음</span>
-                  }
-                </p>
+                  {remaining > 0 ? `D-${remaining}` : remaining === 0 ? 'D-0' : `D+${Math.abs(remaining)}`}
+                </span>
               </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-bold text-slate-800 truncate">{item.name}</h3>
+                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-slate-400 mt-1">
+                  <span className="whitespace-nowrap" title={formatDate(item.entryDate)}>등록: {formatRelativeDate(item.entryDate)}</span>
+                  <span className="whitespace-nowrap" title={formatDate(item.expiryDate)}>마감: {formatRelativeDate(item.expiryDate)}</span>
+                </div>
+              </div>
+            </div>
 
-              <div className="relative">
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 ml-2">
+
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
                 <button
                   onClick={() => setActiveMenu(activeMenu === item.id ? null : item.id)}
-                  className="p-2 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 transition-all transform active:scale-95"
+                  className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all transform active:scale-95 border border-slate-100/50"
                 >
                   <MoreVertical size={18} />
                 </button>
@@ -99,16 +94,19 @@ export const IngredientList: React.FC<Props> = ({ ingredients, onRemove, onUpdat
                 {activeMenu === item.id && (
                   <>
                     <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setActiveMenu(null)}
+                      className="fixed inset-0 z-[100]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveMenu(null);
+                      }}
                     />
-                    <div className="absolute right-0 mt-2 w-24 bg-white rounded-xl shadow-xl border border-slate-100 z-20 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                    <div className="absolute right-0 mt-2 w-28 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[110] animate-in fade-in zoom-in-95 duration-200 origin-top-right overflow-hidden">
                       <button
                         onClick={() => {
                           setEditingItem(item);
                           setActiveMenu(null);
                         }}
-                        className="w-full px-4 py-3 text-left text-sm font-bold text-slate-600 hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors border-b border-slate-200"
+                        className="w-full px-4 py-3 text-left text-sm font-bold text-slate-600 hover:bg-slate-50 flex items-center justify-center gap-2 transition-colors border-b border-slate-100"
                       >
                         <Pencil size={14} className="text-slate-400" />
                         수정
