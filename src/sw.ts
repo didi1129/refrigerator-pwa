@@ -7,7 +7,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 self.addEventListener('push', (event) => {
   const data = event.data?.json() ?? {};
-  const title = data.title ?? '냉장고 재료를 부탁해';
+  const title = data.title ?? '우리집 냉장고를 부탁해';
   const options = {
     body: data.body ?? '확인 필요한 식재료가 있습니다.',
     icon: '/pwa-192x192.png',

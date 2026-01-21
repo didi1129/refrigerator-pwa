@@ -127,7 +127,7 @@ function App() {
               <Refrigerator size={28} />
             </div>
             <div>
-              <h1 className="text-2xl font-black text-slate-800 tracking-tight">냉장고 재료를 부탁해</h1>
+              <h1 className="text-2xl font-black text-slate-800 tracking-tight">우리집 냉장고를 부탁해</h1>
               <p className="text-sm font-bold text-slate-400">우리집 식재료 관리</p>
             </div>
           </div>
@@ -163,7 +163,7 @@ function App() {
         <section>
           <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-800">식재료 리스트</h2>
+              <h2 className="text-lg font-bold text-slate-800">전체</h2>
               <span className="text-sm font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">
                 {ingredients.length}
               </span>
@@ -210,7 +210,7 @@ function App() {
 
       <footer className="mt-20 text-center">
         <p className="text-xs font-bold text-slate-300 tracking-widest uppercase">
-          &copy; 2026 냉장고 재료를 부탁해
+          &copy; 2026 우리집 냉장고를 부탁해
         </p>
       </footer>
     </div>
