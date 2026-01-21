@@ -29,7 +29,8 @@ function App() {
 
       // 모바일 기기에서 독립 실행 모드가 아닌 경우 설치 유도 팝업 노출
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile && !isStandaloneMode) {
+      const isDismissed = localStorage.getItem('pwa-prompt-dismissed') === 'true';
+      if (isMobile && !isStandaloneMode && !isDismissed) {
         setShowPwaInstallPrompt(true);
       }
     };
@@ -104,7 +105,10 @@ function App() {
               </div>
 
               <button
-                onClick={() => setShowPwaInstallPrompt(false)}
+                onClick={() => {
+                  setShowPwaInstallPrompt(false);
+                  localStorage.setItem('pwa-prompt-dismissed', 'true');
+                }}
                 className="mt-6 w-full py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors"
               >
                 닫기

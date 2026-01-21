@@ -7,7 +7,7 @@ import { EditIngredientModal } from './EditIngredientModal';
 interface Props {
   ingredients: Ingredient[];
   onRemove: (id: string) => void;
-  onUpdate: (id: string, updates: Partial<Omit<Ingredient, 'id'>>) => void;
+  onUpdate: (id: string, updates: Partial<Omit<Ingredient, 'id'>>) => Promise<void>;
   suggestions?: string[];
 }
 

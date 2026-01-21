@@ -4,7 +4,7 @@ import type { Ingredient } from '../types/ingredient';
 
 interface Props {
   ingredient: Ingredient;
-  onUpdate: (id: string, updates: Partial<Omit<Ingredient, 'id'>>) => void;
+  onUpdate: (id: string, updates: Partial<Omit<Ingredient, 'id'>>) => Promise<void>;
   onClose: () => void;
   suggestions?: string[];
 }

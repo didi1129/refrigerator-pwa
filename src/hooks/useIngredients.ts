@@ -121,14 +121,15 @@ export const useIngredients = () => {
 
   const updateIngredient = async (id: string, updates: Partial<Omit<Ingredient, 'id'>>) => {
     try {
+      const updateData: any = {};
+      if (updates.name !== undefined) updateData.name = updates.name;
+      if (updates.entryDate !== undefined) updateData.entry_date = updates.entryDate;
+      if (updates.expiryDate !== undefined) updateData.expiry_date = updates.expiryDate;
+      if (updates.category !== undefined) updateData.category = updates.category;
+
       const { error } = await supabase
         .from('ingredients')
-        .update({
-          name: updates.name,
-          entry_date: updates.entryDate,
-          expiry_date: updates.expiryDate,
-          category: updates.category
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;
