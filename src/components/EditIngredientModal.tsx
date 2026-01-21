@@ -88,13 +88,13 @@ export const EditIngredientModal: React.FC<Props> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5 ml-1">
-                <Calendar size={12} /> 입고일
+                <Calendar size={12} /> 등록일
               </label>
               <input
                 type="date"
                 value={entryDate}
                 onChange={(e) => setEntryDate(e.target.value)}
-                className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700"
+                className="w-full px-6 py-5 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700 appearance-none min-h-[4rem]"
                 required
               />
             </div>
@@ -106,7 +106,7 @@ export const EditIngredientModal: React.FC<Props> = ({
                 type="date"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
-                className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700"
+                className="w-full px-6 py-5 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700 appearance-none min-h-[4rem]"
                 required
               />
             </div>
