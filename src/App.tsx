@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Refrigerator, Bell, Share, PlusSquare } from 'lucide-react';
+import { Refrigerator, Bell, Share, PlusSquare, Plus } from 'lucide-react';
 import { useIngredients } from './hooks/useIngredients';
 import { AddIngredientForm } from './components/AddIngredientForm';
 import { IngredientList } from './components/IngredientList';
@@ -13,6 +13,7 @@ interface NavigatorStandalone extends Navigator {
 function App() {
   const { ingredients, suggestions, loading, adding, addIngredient, updateIngredient, removeIngredient } = useIngredients();
   const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isNotificationPermissionNeeded, setIsNotificationPermissionNeeded] = useState(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       return Notification.permission === 'default';
@@ -70,16 +71,16 @@ function App() {
     }
   };
 
-  const handleAdd = (name: string, entryDate: string, expiryDate: string) => {
-    addIngredient({ name, entryDate, expiryDate });
+  const handleAdd = async (name: string, entryDate: string, expiryDate: string) => {
+    await addIngredient({ name, entryDate, expiryDate });
   };
 
   return (
-    <div className="min-h-screen px-6 py-12 max-w-2xl mx-auto bg-slate-50/50">
+    <div className="min-h-screen px-6 py-12 pb-32 max-w-2xl mx-auto bg-slate-50/50">
       {showPwaInstallPrompt && (
         <div className="fixed bottom-6 left-6 right-6 z-50 bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-slate-200 animate-in fade-in slide-in-from-bottom-10 duration-500">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shrink-0">
               <Refrigerator size={24} />
             </div>
             <div className="flex-1">
@@ -119,54 +120,54 @@ function App() {
       )}
       <NotificationBanner ingredients={ingredients} />
 
-      <header className="flex items-center justify-between mb-12">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-white shadow-lg">
-            <Refrigerator size={28} />
+      <header className="mb-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-white shadow-lg">
+              <Refrigerator size={28} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-slate-800 tracking-tight">냉장고 재료를 부탁해</h1>
+              <p className="text-sm font-bold text-slate-400">우리집 식재료 관리</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-black text-slate-800 tracking-tight">냉장고 재료를 부탁해</h1>
-            <p className="text-sm font-bold text-slate-400">우리집 식재료 관리</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            {isNotificationPermissionNeeded && (
-              <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="bg-slate-900 text-white text-[11px] font-bold py-2 px-3 rounded-xl shadow-xl whitespace-nowrap border border-slate-700">
-                  <div className="tooltip-arrow" />
-                  식재료 알림을 켜보세요! 🔔
-                </div>
-              </div>
-            )}
-            <button
-              onClick={handlePushSubscribe}
-              className={`p-3 rounded-2xl transition-all shadow-sm active:scale-95 relative ${isNotificationPermissionNeeded
-                ? 'bg-indigo-600 text-white shadow-indigo-200 shadow-xl scale-110'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              title="알림 받기"
-            >
+          <div className="flex items-center gap-4">
+            <div className="relative">
               {isNotificationPermissionNeeded && (
-                <span className="absolute inset-0 rounded-2xl bg-indigo-600 animate-pulse-ring" />
+                <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="bg-slate-900 text-white text-[11px] font-bold py-2 px-3 rounded-xl shadow-xl whitespace-nowrap border border-slate-700">
+                    <div className="tooltip-arrow" />
+                    식재료 알림을 켜보세요! 🔔
+                  </div>
+                </div>
               )}
-              <Bell size={20} className={isNotificationPermissionNeeded ? 'animate-pulse-dot' : ''} />
-            </button>
-          </div>
-
-          <div className="text-right">
-            <p className="text-2xl font-black text-slate-800">{ingredients.length}</p>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Total Items</p>
+              <button
+                onClick={handlePushSubscribe}
+                className={`p-3 rounded-2xl transition-all shadow-sm active:scale-95 relative ${isNotificationPermissionNeeded
+                  ? 'bg-emerald-500 text-white shadow-emerald-200 shadow-xl scale-110'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                title="알림 받기"
+              >
+                {isNotificationPermissionNeeded && (
+                  <span className="absolute inset-0 rounded-2xl bg-emerald-500 animate-pulse-ring" />
+                )}
+                <Bell size={20} className={isNotificationPermissionNeeded ? 'animate-pulse-dot' : ''} />
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="space-y-8">
-        <AddIngredientForm onAdd={handleAdd} isAdding={adding} suggestions={suggestions} />
-
         <section>
           <div className="flex items-center justify-between mb-4 px-2">
-            <h2 className="text-lg font-bold text-slate-800">식재료 리스트</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-800">식재료 리스트</h2>
+              <span className="text-sm font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">
+                {ingredients.length}
+              </span>
+            </div>
             <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">
               신선도순 정렬
             </span>
@@ -187,6 +188,25 @@ function App() {
           )}
         </section>
       </main>
+
+      {/* Floating Action Button */}
+      <button
+        onClick={() => setIsAddModalOpen(true)}
+        className="fixed bottom-8 right-8 w-16 h-16 bg-emerald-500 text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-emerald-600 transition-all hover:scale-110 active:scale-95 z-40 group shadow-emerald-200"
+        aria-label="식재료 추가"
+      >
+        <Plus size={32} className="group-hover:rotate-90 transition-transform duration-300" />
+      </button>
+
+      {/* Add Ingredient Modal */}
+      {isAddModalOpen && (
+        <AddIngredientForm
+          onAdd={handleAdd}
+          onClose={() => setIsAddModalOpen(false)}
+          isAdding={adding}
+          suggestions={suggestions}
+        />
+      )}
 
       <footer className="mt-20 text-center">
         <p className="text-xs font-bold text-slate-300 tracking-widest uppercase">

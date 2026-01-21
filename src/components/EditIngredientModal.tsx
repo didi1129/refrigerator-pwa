@@ -42,7 +42,7 @@ export const EditIngredientModal: React.FC<Props> = ({
       >
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-500 flex items-center justify-center">
               <Save size={20} />
             </div>
             <h2 className="text-2xl font-black text-slate-800 tracking-tight">식재료 정보 수정</h2>
@@ -66,7 +66,7 @@ export const EditIngredientModal: React.FC<Props> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="식재료 이름을 입력하세요"
-              className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-bold text-slate-700"
+              className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700"
               required
             />
             <datalist id="edit-suggestions">
@@ -85,7 +85,7 @@ export const EditIngredientModal: React.FC<Props> = ({
                 type="date"
                 value={entryDate}
                 onChange={(e) => setEntryDate(e.target.value)}
-                className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-bold text-slate-700"
+                className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700"
                 required
               />
             </div>
@@ -97,7 +97,7 @@ export const EditIngredientModal: React.FC<Props> = ({
                 type="date"
                 value={expiryDate}
                 onChange={(e) => setExpiryDate(e.target.value)}
-                className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-bold text-slate-700"
+                className="w-full px-5 py-4 rounded-[1.25rem] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-slate-700"
                 required
               />
             </div>
@@ -114,7 +114,7 @@ export const EditIngredientModal: React.FC<Props> = ({
             <button
               type="submit"
               disabled={isUpdating}
-              className="flex-[2] bg-slate-900 text-white py-4 rounded-[1.25rem] font-bold text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.98]"
+              className="flex-[2] bg-emerald-500 text-white py-4 rounded-[1.25rem] font-bold text-lg hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.98]"
             >
               {isUpdating ? (
                 <>
