@@ -67,13 +67,13 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd, isAdding, suggestion
 
         <div className="space-y-2 md:col-span-2">
           <label className="text-sm font-medium text-slate-500 mb-2 block">마감 기한</label>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
             {[3, 7, 14, 30].map((days) => (
               <button
                 key={days}
                 type="button"
                 onClick={() => setExpiryDays(days.toString())}
-                className={`flex-1 py-2 rounded-xl border transition-all font-semibold ${expiryDays === days.toString()
+                className={`py-3 rounded-xl border transition-all font-semibold text-sm ${expiryDays === days.toString()
                   ? 'bg-mint-500 border-mint-500 text-white shadow-lg'
                   : 'bg-white/50 border-slate-200 text-slate-500 hover:bg-white'
                   }`}
@@ -81,12 +81,15 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd, isAdding, suggestion
                 {days}일
               </button>
             ))}
-            <input
-              type="number"
-              value={expiryDays}
-              onChange={(e) => setExpiryDays(e.target.value)}
-              className="w-20 px-4 py-2 rounded-xl bg-white/50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-mint-500 text-center font-bold"
-            />
+            <div className="col-span-1">
+              <input
+                type="number"
+                value={expiryDays}
+                onChange={(e) => setExpiryDays(e.target.value)}
+                className="w-full h-full px-2 py-3 rounded-xl bg-white/50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-mint-500 text-center font-bold text-sm"
+                placeholder="직접"
+              />
+            </div>
           </div>
         </div>
       </div>

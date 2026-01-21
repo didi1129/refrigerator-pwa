@@ -1,4 +1,5 @@
-import { differenceInDays, parseISO, format } from 'date-fns';
+import { differenceInDays, parseISO, format, formatDistanceToNow } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 export const getRemainingDays = (expiryDate: string): number => {
   const now = new Date();
@@ -15,4 +16,8 @@ export const getExpiryStatus = (expiryDate: string): 'expired' | 'urgent' | 'saf
 
 export const formatDate = (dateString: string): string => {
   return format(parseISO(dateString), 'yyyy.MM.dd');
+};
+
+export const formatRelativeDate = (dateString: string): string => {
+  return formatDistanceToNow(parseISO(dateString), { addSuffix: true, locale: ko });
 };

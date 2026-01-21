@@ -11,7 +11,7 @@ interface NavigatorStandalone extends Navigator {
 }
 
 function App() {
-  const { ingredients, suggestions, loading, adding, addIngredient, removeIngredient } = useIngredients();
+  const { ingredients, suggestions, loading, adding, addIngredient, updateIngredient, removeIngredient } = useIngredients();
   const [showPwaInstallPrompt, setShowPwaInstallPrompt] = useState(false);
   const [isNotificationPermissionNeeded, setIsNotificationPermissionNeeded] = useState(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -107,7 +107,7 @@ function App() {
                 onClick={() => setShowPwaInstallPrompt(false)}
                 className="mt-6 w-full py-3 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors"
               >
-                나중에 할게요
+                닫기
               </button>
             </div>
           </div>
@@ -174,7 +174,12 @@ function App() {
               <p className="text-sm font-bold text-slate-400">냉장고 확인 중...</p>
             </div>
           ) : (
-            <IngredientList ingredients={ingredients} onRemove={removeIngredient} />
+            <IngredientList
+              ingredients={ingredients}
+              onRemove={removeIngredient}
+              onUpdate={updateIngredient}
+              suggestions={suggestions}
+            />
           )}
         </section>
       </main>

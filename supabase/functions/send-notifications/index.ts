@@ -65,7 +65,11 @@ Deno.serve(async (req) => {
       url: '/'
     })
 
-    const sendPromises = (subs || []).map(sub => webpush.sendNotification(sub.subscription, payload).catch(() => null))
+    const uniqueSubs = Array.from(
+      new Map((subs || []).map(sub => [sub.subscription.endpoint, sub])).values()
+    );
+
+    const sendPromises = uniqueSubs.map(sub => webpush.sendNotification(sub.subscription, payload).catch(() => null))
     await Promise.all(sendPromises)
 
     return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

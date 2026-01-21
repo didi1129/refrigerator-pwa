@@ -119,5 +119,24 @@ export const useIngredients = () => {
     }
   };
 
-  return { ingredients, suggestions, loading, adding, addIngredient, removeIngredient };
+  const updateIngredient = async (id: string, updates: Partial<Omit<Ingredient, 'id'>>) => {
+    try {
+      const { error } = await supabase
+        .from('ingredients')
+        .update({
+          name: updates.name,
+          entry_date: updates.entryDate,
+          expiry_date: updates.expiryDate,
+          category: updates.category
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+      await fetchIngredients();
+    } catch (e) {
+      console.error('Failed to update ingredient', e);
+    }
+  };
+
+  return { ingredients, suggestions, loading, adding, addIngredient, updateIngredient, removeIngredient };
 };
