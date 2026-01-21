@@ -20,8 +20,8 @@ export default defineConfig({
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: '내 냉장고를 부탁해',
-        short_name: '냉장고PWA',
+        name: '냉장고 재료를 부탁해',
+        short_name: '냉장고재료를부탁해',
         description: '냉장고 식재료 관리 및 유통기한 알림 서비스',
         theme_color: '#ffffff',
         background_color: '#ffffff',
