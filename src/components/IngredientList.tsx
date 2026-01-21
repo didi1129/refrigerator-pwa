@@ -115,7 +115,7 @@ export const IngredientList: React.FC<Props> = ({ ingredients, onRemove, onUpdat
                       </button>
                       <button
                         onClick={() => {
-                          if (confirm('정말 삭제하시겠습니까?')) {
+                          if (confirm(`${item.name}을(를) 목록에서 지웁니다.`)) {
                             onRemove(item.id);
                           }
                           setActiveMenu(null);
