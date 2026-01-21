@@ -104,16 +104,24 @@ export const AddIngredientForm: React.FC<Props> = ({ onAdd, onClose, isAdding, s
           <div className="space-y-3">
             <label className="text-xs font-black text-slate-400 uppercase tracking-wider ml-1">기한 간편 설정</label>
             <div className="grid grid-cols-4 gap-2">
-              {[3, 7, 14, 30].map((days) => (
-                <button
-                  key={days}
-                  type="button"
-                  onClick={() => setRelativeExpiry(days)}
-                  className="py-3 rounded-xl border border-slate-100 bg-white text-slate-500 font-bold text-sm hover:border-emerald-200 hover:bg-emerald-50/30 transition-all active:scale-95"
-                >
-                  {days}일
-                </button>
-              ))}
+              {[3, 7, 14, 30].map((days) => {
+                const calculatedDate = format(addDays(new Date(entryDate), days), 'yyyy-MM-dd');
+                const isActive = expiryDate === calculatedDate;
+
+                return (
+                  <button
+                    key={days}
+                    type="button"
+                    onClick={() => setRelativeExpiry(days)}
+                    className={`py-3 rounded-xl border transition-all font-bold text-sm ${isActive
+                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
+                        : 'bg-white border-slate-100 text-slate-500 hover:border-emerald-200 hover:bg-emerald-50/30'
+                      } active:scale-95`}
+                  >
+                    {days}일
+                  </button>
+                );
+              })}
             </div>
           </div>
 
